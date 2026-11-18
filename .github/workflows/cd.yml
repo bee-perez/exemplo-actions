@@ -1,0 +1,22 @@
+name: "Exemplo de CD"
+
+on:
+    push: # Nesse caso, o deploy será feito quando um push for feito na branch main
+        branches:
+            - main
+
+jobs:
+    deploy:
+        runs-on: self-hosted # Aqui indicamos que será executado em um agente próprio (EC2)
+        steps:
+          - name: Pull Docker image # Puxa a imagem do Docker Hub
+            run: docker pull beeperez/exemplo-actions:latest
+
+          - name: Stop Docker container # Para o container, caso ele esteja rodando
+            run: docker stop exemplo-actions || true
+
+          - name: Remove Docker container # Remove o container, caso ele exista
+            run: docker rm exemplo-actions || true
+
+          - name: Run Docker container # Roda o container com a imagem recém lançada
+            run: docker run --name exemplo-actions -d -p 8080:8080 beeperez/exemplo-actions:latest
